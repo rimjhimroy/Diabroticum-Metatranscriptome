@@ -7,7 +7,7 @@ export TRINITY_HOME=$CONDA_PREFIX
 ```
 Other softwares you would need
 - pandoc  
-- R package rmarkdown  
+- R package rmarkdown `conda install -c r r-rmarkdown`    
 
 export TRINITY_HOME="/path/to/trinity"
 
