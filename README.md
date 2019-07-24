@@ -28,6 +28,7 @@ EOF
 Other softwares you would need
 - pandoc `conda install -c conda-forge pandoc`  
 - R package rmarkdown `conda install -c r r-rmarkdown`    
+- R package venndiagram, gplot, here `conda install r-venndiagram r-gplots r-here`
 
 
 ```
