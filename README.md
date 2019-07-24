@@ -16,7 +16,7 @@ cat <<EOF > ./etc/conda/activate.d/env_vars.sh
 #!/bin/bash
 export OLD_LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}
-export TRINITY_HOME=${CONDA_PREFIX}
+export TRINITY_HOME=${CONDA_PREFIX}/opt/trinity-2.8.5
 EOF
 cat <<EOF > ./etc/conda/deactivate.d/env_vars.sh
 #!/bin/bash
