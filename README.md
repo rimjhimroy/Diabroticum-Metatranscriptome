@@ -26,10 +26,9 @@ EOF
 
 ```
 Other softwares you would need
-- pandoc  
+- pandoc `conda install -c conda-forge pandoc`  
 - R package rmarkdown `conda install -c r r-rmarkdown`    
 
-export TRINITY_HOME="/path/to/trinity"
 
 ```
 R -e "rmarkdown::render('project.Rmd',output_file='output.pdf')"
