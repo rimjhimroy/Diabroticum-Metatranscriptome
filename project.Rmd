@@ -1,13 +1,13 @@
 ---
 title: "Diabroticum Insect Differential expression"
-output: pdf_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+Classify transcripts into insect, plant and bacteria
 
 ```{r classification}
 
