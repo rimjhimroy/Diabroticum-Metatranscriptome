@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Diabroticum Insect Differential expression"
 output: pdf_document
 ---
 
@@ -9,11 +9,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r classification}
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
+#list.of.packages <- c("here", "VennDiagram","ape","gplots")
+#new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+#if(length(new.packages)) install.packages(new.packages, repos = "http://cran.us.r-project.org")
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager",repos = "http://cran.us.r-project.org")
 library(here)
 
 dat=read.table(here("Final_classification.txt"),header=T,sep='\t',stringsAsFactors = F)
@@ -50,7 +52,9 @@ arthropoda=dt1$Genes[grepl("Arthropoda", dt1$Swissprot.Description,ignore.case =
 ## Including Plots Venndiagram
 
 
-```{r pressure, echo=FALSE}
+```{r venn, echo=FALSE}
+system("rm *.log")
+system("rm *.tiff")
 library(VennDiagram)
 all=unique(dt$Genes)
 ann=unique(c(bact,plant,arthropoda))
@@ -76,23 +80,20 @@ venn.diagram(xx.1, imagetype="tiff",filename ="Venn.tiff", height = 3000, width 
 Extract arthropoda read count:
 
 ```{r arthropoda}
-library(DESeq2)
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")biocLite('edgeR')
-BiocManager::install('limma')
-BiocManager::install('DESeq2')
-BiocManager::install('ctc')
-BiocManager::install('Biobase')
-BiocManager::install('gplots')
-BiocManager::install('ape')
+#BiocManager::install("edgeR")
+#BiocManager::install('limma')
+#BiocManager::install('DESeq2')
+#BiocManager::install('ctc')
+#BiocManager::install('Biobase')
+
 df <- read.table(gzfile(here("merged.readcount.txt.gz")),header=T,stringsAsFactors = F)
 dA=df[df$gene_id%in%arth,]
 cols=data.frame(names(dA[,-1]))
 
-cols$cond=ifelse(grepl("bx1_", cols$names.dA....1..) & grepl("_B0", cols$names.dA....1..) ,"bx1B0","NA")
-cols$cond=ifelse(grepl("bx1_", cols$names.dA....1..) & grepl("_B3", cols$names.dA....1..) ,"bx1B3",cols$cond)
-cols$cond=ifelse(grepl("bx2_", cols$names.dA....1..) & grepl("_B0", cols$names.dA....1..) ,"bx2B0",cols$cond)
-cols$cond=ifelse(grepl("bx2_", cols$names.dA....1..) & grepl("_B3", cols$names.dA....1..) ,"bx2B3",cols$cond)
+cols$cond=ifelse(grepl("bx1_", cols$names.dA....1..) & grepl("_B0", cols$names.dA....1..) ,"Bx1B0","NA")
+cols$cond=ifelse(grepl("bx1_", cols$names.dA....1..) & grepl("_B3", cols$names.dA....1..) ,"Bx1B3",cols$cond)
+cols$cond=ifelse(grepl("bx2_", cols$names.dA....1..) & grepl("_B0", cols$names.dA....1..) ,"Bx2B0",cols$cond)
+cols$cond=ifelse(grepl("bx2_", cols$names.dA....1..) & grepl("_B3", cols$names.dA....1..) ,"Bx2B3",cols$cond)
 cols$cond=ifelse(grepl("R32_", cols$names.dA....1..) & grepl("_B0", cols$names.dA....1..) ,"R32B0",cols$cond)
 cols$cond=ifelse(grepl("R32_", cols$names.dA....1..) & grepl("_B3", cols$names.dA....1..) ,"R32B3",cols$cond)
 cols$cond=ifelse(grepl("W22_", cols$names.dA....1..) & grepl("_B0", cols$names.dA....1..) ,"W22B0",cols$cond)
@@ -117,6 +118,6 @@ write.table(dA,"count.matrix.arthropoda.txt",row.names = F,sep='\t',quote = F)
 
 
 
-system("$TRINITY_HOME/Analysis/DifferentialExpression/run_DE_analysis.pl --matrix count.matrix.arthropoda.txt --method DESeq2 --samples_file samples_file.txt --min_rowSum_counts 100 --contrasts contrasts.txt --output Dseq2_components/")
+system("$TRINITY_HOME/Analysis/DifferentialExpression/run_DE_analysis.pl --matrix count.matrix.arthropoda.txt --method DESeq2 --samples_file samples_file.txt --contrasts contrasts.txt --output Dseq2_components/")
 
 ```
