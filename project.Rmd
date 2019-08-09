@@ -49,7 +49,7 @@ arthropoda=dt1$Genes[grepl("Arthropoda", dt1$Swissprot.Description,ignore.case =
 
 ```
 
-## Including Plots Venndiagram
+Including Plots Venndiagram
 
 
 ```{r venn, echo=FALSE}
@@ -115,9 +115,28 @@ write.table(cols2,"samples_file.txt",row.names = F,col.names = F,sep='\t',quote 
 write.table(combs,"contrasts.txt",row.names = F,col.names = F,sep='\t',quote = F)
 write.table(dA,"count.matrix.arthropoda.txt",row.names = F,sep='\t',quote = F)
 
-
-
-
 system("$TRINITY_HOME/Analysis/DifferentialExpression/run_DE_analysis.pl --matrix count.matrix.arthropoda.txt --method DESeq2 --samples_file samples_file.txt --contrasts contrasts.txt --output Dseq2_components/")
 
+
+
+```
+
+Count differentially expressed:
+```{r countDE}
+library(goseq)
+library(reshape2)
+files <- list.files(path="Dseq2_components", pattern="*_results", full.names=TRUE, recursive=FALSE)
+gomapping=read.table("GO_classification1.dat",header=F,sep='\t',fill=T)
+gomap=melt(t(gomapping), id.vars="V1" )
+lapply(files, function(x) {
+    t <- read.table(x, header=TRUE, stringsAsFactors = F) # load file
+    #filter based on padj<0.05 and two-fold change
+    t1 <- t[t$padj<0.05&abs(t$log2FoldChange)>1,]
+    # apply function
+    
+    gene.vector=as.integer(assayed.genes%in%de.genes)
+    # write to file
+    write.table(out, "path/to/output", sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
+})
+  
 ```
