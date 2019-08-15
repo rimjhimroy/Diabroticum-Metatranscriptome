@@ -1,0 +1,38 @@
+if (! require(edgeR)) {
+   source("https://bioconductor.org/biocLite.R")
+   biocLite("edgeR")
+   library(edgeR)
+}
+
+if (! require(DESeq2)) {
+   source("https://bioconductor.org/biocLite.R")
+   biocLite("DESeq2")
+   library(DESeq2)
+}
+
+data = read.table("/media/parisod/Data/rimjhim/Diabrotica/diabroticum/count.matrix.arthropoda.txt", header=T, row.names=1, com='')
+col_ordering = c(1,2,3,4,5,6,7,43,44,45,46,47,48,49)
+rnaseqMatrix = data[,col_ordering]
+rnaseqMatrix = round(rnaseqMatrix)
+rnaseqMatrix = rnaseqMatrix[rowSums(cpm(rnaseqMatrix) > 1) >= 2,]
+conditions = data.frame(conditions=factor(c(rep("Bx1B0", 7), rep("W22B0", 7))))
+rownames(conditions) = colnames(rnaseqMatrix)
+ddsFullCountTable <- DESeqDataSetFromMatrix(
+    countData = rnaseqMatrix,
+    colData = conditions,
+    design = ~ conditions)
+dds = DESeq(ddsFullCountTable)
+contrast=c("conditions","Bx1B0","W22B0")
+res = results(dds, contrast)
+baseMeanA <- rowMeans(counts(dds, normalized=TRUE)[,colData(dds)$conditions == "Bx1B0"])
+baseMeanB <- rowMeans(counts(dds, normalized=TRUE)[,colData(dds)$conditions == "W22B0"])
+res = cbind(baseMeanA, baseMeanB, as.data.frame(res))
+res = cbind(sampleA="Bx1B0", sampleB="W22B0", as.data.frame(res))
+res$padj[is.na(res$padj)]  <- 1
+res = as.data.frame(res[order(res$pvalue),])
+write.table(res, file='count.matrix.arthropoda.txt.Bx1B0_vs_W22B0.DESeq2.DE_results', sep='	', quote=FALSE)
+write.table(rnaseqMatrix, file='count.matrix.arthropoda.txt.Bx1B0_vs_W22B0.DESeq2.count_matrix', sep='	', quote=FALSE)
+source("/home/parisod/miniconda3/envs/Trinity-2.8.5/opt/trinity-2.8.5/Analysis/DifferentialExpression/R/rnaseq_plot_funcs.R")
+pdf("count.matrix.arthropoda.txt.Bx1B0_vs_W22B0.DESeq2.DE_results.MA_n_Volcano.pdf")
+plot_MA_and_Volcano(rownames(res), log2(res$baseMean+1), res$log2FoldChange, res$padj)
+dev.off()
