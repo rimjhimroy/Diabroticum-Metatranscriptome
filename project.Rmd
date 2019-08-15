@@ -2,6 +2,15 @@
 title: "Diabroticum Insect Differential expression"
 output: github_document
 ---
+The code needs:
+1. A classification file for superkingdom	phylum	genus	species	kingdom of organisms (Final_classification.txt)
+2. A file specifying annotation of transcripts into superkingdom of origin based on swissprot evidence (annotations_extracted2.txt)
+3. A gzipped file of read count per transcript for every sample (merged.readcount.txt.gz)
+4. Sample file and contrasts file (samples_file.txt, contrasts.txt)
+5. A GO mapping file with every gene mapped to all GO terms - 1:1 mapping (GO_classification_final.dat)
+6. Gene length table (Gene_length_from_DEG_annot_xls.txt)
+
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -77,8 +86,8 @@ venn.diagram(xx.1, imagetype="tiff",filename ="Venn.tiff", height = 3000, width 
 
 
 ```
-Extract arthropoda read count:
 
+Extract arthropoda read counts per contrast and do differential expression analysis with Deseq2:
 ```{r arthropoda}
 #BiocManager::install("edgeR")
 #BiocManager::install('limma')
@@ -121,22 +130,85 @@ system("$TRINITY_HOME/Analysis/DifferentialExpression/run_DE_analysis.pl --matri
 
 ```
 
-Count differentially expressed:
+Enrichment analysis for differentially expressed genes:
 ```{r countDE}
 library(goseq)
 library(reshape2)
 files <- list.files(path="Dseq2_components", pattern="*_results", full.names=TRUE, recursive=FALSE)
-gomapping=read.table("GO_classification1.dat",header=F,sep='\t',fill=T)
-gomap=melt(t(gomapping), id.vars="V1" )
+#gomapping=read.table("GO_classification1.dat",header=F,sep='\t',fill=T)
+#s <- strsplit(as.character(gomapping$V2), ',')
+#dat=data.frame(GOterm=rep(gomapping$V1, sapply(s, FUN=length)),director=unlist(s))
+#names(dat)=c("GOTerms","Genenames")
+#gomap=dat[,c(2,1)]
+#write.table(gomap,"GO_classification_final.dat",row.names = F,quote = F,sep='\t')
+
+gomap=read.table(gzfile(here("GO_classification_final.dat.gz")),header=T,sep='\t')
+de.genes=gomapping$Genenames
+gene.len=read.table("Gene_length_from_DEG_annot_xls.txt",header=T,sep='\t',stringsAsFactors = F)
 lapply(files, function(x) {
+    filenm <- sub(".DESeq2.DE_results", "", x)
+    filenm1 <- sub("Dseq2_components/*count.matrix.", "", filenm)
+    print(paste("PROCESSING GENE ENRICHMENT FOR:",filenm1,sep=' '))
+    cat("--------------------------------------\n")
     t <- read.table(x, header=TRUE, stringsAsFactors = F) # load file
     #filter based on padj<0.05 and two-fold change
     t1 <- t[t$padj<0.05&abs(t$log2FoldChange)>1,]
     # apply function
-    
+    assayed.genes <- rownames(t)
+    de.genes <- rownames(t1)
     gene.vector=as.integer(assayed.genes%in%de.genes)
-    # write to file
-    write.table(out, "path/to/output", sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
-})
+    names(gene.vector)=assayed.genes
+    gene_len=gene.len[gene.len$gene_id%in%assayed.genes,]
+    gene.length<-as.vector(t(gene_len$Gene.Length))
+    names(gene.length)=gene_len$gene_id
+    
+    pwf<-nullp(gene.vector,bias.data=gene.length)
+    GO.wall=goseq(pwf,gene2cat=gomap)
+    GO.samp=goseq(pwf,gene2cat=gomap,method="Sampling",repcnt=1000)
+    
+
+    ```
+    
+    ```{r plot, echo=FALSE}
+    {plot(log10(GO.wall[,2]),log10(GO.samp[match(GO.samp[,1],GO.wall[,1]),2]),xlab="log10(Wallenius p-values)", ylab="log10(Sampling p-values)", xlim=c(-3,0) )
+    abline(0,1,col=3,lty=2)}
+    ```
+Plotting the pvalues against one another, we see that there is little difference between the two methods. However, the accuracy of the sampling method is limited by the number of samples generated, repcnt, such that very low p-values will not be correctly calculated. Significantly enriched GO terms may then be missed after correcting for multiple testing.
+
+Testing without length correction. NEVER use this option as your final analysis.
+```{r NocorrDE}
+GO.nobias=goseq(pwf,gene2cat=gomap,method="Hypergeometric")
   
+```
+
+
+    ```{r plot, echo=FALSE}
+    {plot(log10(GO.wall[,2]),log10(GO.nobias[match(GO.nobias[,1],GO.wall[,1]),2]),xlab="log10(Wallenius p-values)", ylab="log10(Nobias p-values)", xlim=c(-3,0) )
+    abline(0,1,col=3,lty=2)}
+    ```
+    
+Ignoring length bias gives very different results from a length bias corrected analysis.
+
+Enriched Go categories:
+```{r NocorrDE}
+enriched.GO=GO.wall$category[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05]
+enriched.GO.tab=GO.wall[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05,]
+library(GO.db)
+GOtable=paste(filenm1,"enriched_GOtables.txt")
+dir.create("overallGOtables")
+write.table(enriched.GO.tab,paste("overallGOtables/",GOtable,sep=''),row.names = F,quote = F,sep='\t')
+
+GOdetails=paste(filenm1,"enriched_GOdetails.txt")
+dir.create("overallGOdetails")
+sink(file=paste("overallGOdetails/",GOdetails,sep=''),type="output")
+cat("AllGO: ",enriched.GO)
+for(go in enriched.GO[1:length(enriched.GO)]){
+  print(GOTERM[[go]])
+  cat("--------------------------------------\n")
+}
+sink()
+  
+ 
+})
+
 ```
