@@ -172,7 +172,7 @@ for (x in files)  {
     enriched.GO=GO.wall$category[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05]
 enriched.GO.tab=GO.wall[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05,]
 library(GO.db)
-GOtable=paste(filenm1,"enriched_GOtables.txt")
+GOtable=paste(filenm1,"enriched_GOtables.txt",sep='_')
 dir.create("overallGOtables")
 write.table(enriched.GO.tab,paste("overallGOtables/",GOtable,sep=''),row.names = F,quote = F,sep='\t')
     
@@ -218,7 +218,7 @@ keggmap=read.table(here("KEGG_classification_final.txt"),header=T,sep='\t')
 KEGG=goseq(pwf,gene2cat=keggmap)
 enriched.kegg=KEGG$category[p.adjust(KEGG$over_represented_pvalue, method="BH")<.05]
 enriched.kegg.tab=KEGG[p.adjust(KEGG$over_represented_pvalue, method="BH")<.05,]
-keggtable=paste(filenm1,"Keggtables.txt")
+keggtable=paste(filenm1,"Keggtables.txt",sep='_')
 dir.create("overallKeggtables")
 write.table(KEGG,paste("overallkeggtables/",keggtable,sep=''),row.names = F,quote = F,sep='\t')
 
