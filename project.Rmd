@@ -190,7 +190,7 @@ GO.nobias=goseq(pwf,gene2cat=gomap,method="Hypergeometric")
 Ignoring length bias gives very different results from a length bias corrected analysis.
 
 Enriched Go categories:
-```{r NocorrDE}
+```{r DE}
 enriched.GO=GO.wall$category[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05]
 enriched.GO.tab=GO.wall[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05,]
 library(GO.db)
