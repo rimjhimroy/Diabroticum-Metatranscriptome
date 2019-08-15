@@ -169,7 +169,7 @@ lapply(files, function(x) {
 
     ```
     
-    ```{r plot, echo=FALSE}
+    ```{r plotWallNSamp, echo=FALSE}
     {plot(log10(GO.wall[,2]),log10(GO.samp[match(GO.samp[,1],GO.wall[,1]),2]),xlab="log10(Wallenius p-values)", ylab="log10(Sampling p-values)", xlim=c(-3,0) )
     abline(0,1,col=3,lty=2)}
     ```
@@ -182,7 +182,7 @@ GO.nobias=goseq(pwf,gene2cat=gomap,method="Hypergeometric")
 ```
 
 
-    ```{r plot, echo=FALSE}
+    ```{r plotest, echo=FALSE}
     {plot(log10(GO.wall[,2]),log10(GO.nobias[match(GO.nobias[,1],GO.wall[,1]),2]),xlab="log10(Wallenius p-values)", ylab="log10(Nobias p-values)", xlim=c(-3,0) )
     abline(0,1,col=3,lty=2)}
     ```
