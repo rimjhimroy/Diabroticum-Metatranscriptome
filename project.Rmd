@@ -165,38 +165,33 @@ lapply(files, function(x) {
     pwf<-nullp(gene.vector,bias.data=gene.length)
     GO.wall=goseq(pwf,gene2cat=gomap)
     GO.samp=goseq(pwf,gene2cat=gomap,method="Sampling",repcnt=1000)
+     plot(log10(GO.wall[,2]),log10(GO.samp[match(GO.samp[,1],GO.wall[,1]),2]),xlab=paste(filenm1,"log10(Wallenius p-values)",sep=' '), ylab="log10(Sampling p-values)", xlim=c(-3,0) )
+    abline(0,1,col=3,lty=2)
     
-
-    ```
-    
-    ```{r plotWallNSamp, echo=FALSE}
-    {plot(log10(GO.wall[,2]),log10(GO.samp[match(GO.samp[,1],GO.wall[,1]),2]),xlab="log10(Wallenius p-values)", ylab="log10(Sampling p-values)", xlim=c(-3,0) )
-    abline(0,1,col=3,lty=2)}
-    ```
-Plotting the pvalues against one another, we see that there is little difference between the two methods. However, the accuracy of the sampling method is limited by the number of samples generated, repcnt, such that very low p-values will not be correctly calculated. Significantly enriched GO terms may then be missed after correcting for multiple testing.
-
-Testing without length correction. NEVER use this option as your final analysis.
-```{r NocorrDE}
-GO.nobias=goseq(pwf,gene2cat=gomap,method="Hypergeometric")
-  
-```
-
-
-    ```{r plotest, echo=FALSE}
-    {plot(log10(GO.wall[,2]),log10(GO.nobias[match(GO.nobias[,1],GO.wall[,1]),2]),xlab="log10(Wallenius p-values)", ylab="log10(Nobias p-values)", xlim=c(-3,0) )
-    abline(0,1,col=3,lty=2)}
-    ```
-    
-Ignoring length bias gives very different results from a length bias corrected analysis.
-
-Enriched Go categories:
-```{r DE}
-enriched.GO=GO.wall$category[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05]
+    enriched.GO=GO.wall$category[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05]
 enriched.GO.tab=GO.wall[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05,]
 library(GO.db)
 GOtable=paste(filenm1,"enriched_GOtables.txt")
 dir.create("overallGOtables")
 write.table(enriched.GO.tab,paste("overallGOtables/",GOtable,sep=''),row.names = F,quote = F,sep='\t')
+    
+
+ 
+#Plotting the pvalues against one another, we see that there is little difference between the two methods. However, the accuracy of the sampling method is limited by the number of samples generated, repcnt, such that very low p-values will not be correctly calculated. Significantly enriched GO terms may then be missed after correcting for multiple testing.
+
+#Testing without length correction. NEVER use this option as your final analysis.
+
+GO.nobias=goseq(pwf,gene2cat=gomap,method="Hypergeometric")
+  
+
+    {plot(log10(GO.wall[,2]),log10(GO.nobias[match(GO.nobias[,1],GO.wall[,1]),2]),xlab="log10(Wallenius p-values)", ylab="log10(Nobias p-values)", xlim=c(-3,0) )
+    abline(0,1,col=3,lty=2)}
+
+    
+#Ignoring length bias gives very different results from a length bias corrected analysis.
+
+#Enriched Go categories:
+
 
 GOdetails=paste(filenm1,"enriched_GOdetails.txt")
 dir.create("overallGOdetails")
