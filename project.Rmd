@@ -194,7 +194,7 @@ GO.nobias=goseq(pwf,gene2cat=gomap,method="Hypergeometric")
 #Enriched Go categories:
 
 
-GOdetails=paste(filenm1,"enriched_GOdetails.txt")
+GOdetails=paste(filenm1,"enriched_GOdetails.txt",sep='_')
 dir.create("overallGOdetails")
 sink(file=paste("overallGOdetails/",GOdetails,sep=''),type="output")
 cat("AllGO: ",enriched.GO)
@@ -220,7 +220,7 @@ enriched.kegg=KEGG$category[p.adjust(KEGG$over_represented_pvalue, method="BH")<
 enriched.kegg.tab=KEGG[p.adjust(KEGG$over_represented_pvalue, method="BH")<.05,]
 keggtable=paste(filenm1,"Keggtables.txt",sep='_')
 dir.create("overallKeggtables")
-write.table(KEGG,paste("overallkeggtables/",keggtable,sep=''),row.names = F,quote = F,sep='\t')
+write.table(KEGG,paste("overallKeggtables/",keggtable,sep=''),row.names = F,quote = F,sep='\t')
 
  
 }
