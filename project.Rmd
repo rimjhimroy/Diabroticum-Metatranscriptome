@@ -12,8 +12,8 @@ The code needs:
 
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r, echo=FALSE}
+knitr::opts_chunk$set(error = TRUE)
 ```
 
 Classify transcripts into insect, plant and bacteria
