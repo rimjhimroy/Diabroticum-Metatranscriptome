@@ -143,7 +143,7 @@ files <- list.files(path="Dseq2_components", pattern="*_results", full.names=TRU
 #write.table(gomap,"GO_classification_final.dat",row.names = F,quote = F,sep='\t')
 
 gomap=read.table(gzfile(here("GO_classification_final.dat.gz")),header=T,sep='\t')
-de.genes=gomapping$Genenames
+de.genes=gomap$Genenames
 gene.len=read.table("Gene_length_from_DEG_annot_xls.txt",header=T,sep='\t',stringsAsFactors = F)
 lapply(files, function(x) {
     filenm <- sub(".DESeq2.DE_results", "", x)
