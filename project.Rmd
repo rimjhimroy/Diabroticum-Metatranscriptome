@@ -145,7 +145,8 @@ files <- list.files(path="Dseq2_components", pattern="*_results", full.names=TRU
 gomap=read.table(gzfile(here("GO_classification_final.dat.gz")),header=T,sep='\t')
 de.genes=gomap$Genenames
 gene.len=read.table("Gene_length_from_DEG_annot_xls.txt",header=T,sep='\t',stringsAsFactors = F)
-lapply(files, function(x) {
+
+for (x in files)  {
     filenm <- sub(".DESeq2.DE_results", "", x)
     filenm1 <- sub("Dseq2_components/*count.matrix.", "", filenm)
     print(paste("PROCESSING GENE ENRICHMENT FOR:",filenm1,sep=' '))
@@ -222,6 +223,6 @@ dir.create("overallKeggtables")
 write.table(KEGG,paste("overallkeggtables/",keggtable,sep=''),row.names = F,quote = F,sep='\t')
 
  
-})
+}
 
 ```
