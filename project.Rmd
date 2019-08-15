@@ -206,8 +206,26 @@ for(go in enriched.GO[1:length(enriched.GO)]){
   print(GOTERM[[go]])
   cat("--------------------------------------\n")
 }
+
 sink()
-  
+
+
+#Kegg Pathway:
+#keggmapping=read.table("Kegg_pathway.dat",header=T,sep='\t',fill=T)
+#s <- strsplit(as.character(keggmapping$Gene.IDs), ',')
+#dat=data.frame(Keggterm=rep(keggmapping$Pathway.ID,sapply(s,FUN=length)),director=unlist(s))
+#names(dat)=c("KeggTerms","Genenames")
+#keggmap=dat[,c(2,1)]
+#write.table(keggmap,"KEGG_classification_final.txt",row.names = F,quote = F,sep='\t')
+keggmap=read.table(here("KEGG_classification_final.txt"),header=T,sep='\t')
+
+KEGG=goseq(pwf,gene2cat=keggmap)
+enriched.kegg=KEGG$category[p.adjust(KEGG$over_represented_pvalue, method="BH")<.05]
+enriched.kegg.tab=KEGG[p.adjust(KEGG$over_represented_pvalue, method="BH")<.05,]
+keggtable=paste(filenm1,"Keggtables.txt")
+dir.create("overallKeggtables")
+write.table(KEGG,paste("overallkeggtables/",keggtable,sep=''),row.names = F,quote = F,sep='\t')
+
  
 })
 
