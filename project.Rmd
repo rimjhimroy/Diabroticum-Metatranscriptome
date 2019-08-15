@@ -151,7 +151,7 @@ for (x in files)  {
     filenm1 <- sub("Dseq2_components/*count.matrix.", "", filenm)
     print(paste("PROCESSING GENE ENRICHMENT FOR:",filenm1,sep=' '))
     cat("--------------------------------------\n")
-    t <- read.table(x, header=TRUE, stringsAsFactors = F) # load file
+        t <- read.table(x, header=TRUE, stringsAsFactors = F) # load file
     #filter based on padj<0.05 and two-fold change
     t1 <- t[t$padj<0.05&abs(t$log2FoldChange)>1,]
     # apply function
@@ -221,6 +221,7 @@ enriched.kegg.tab=KEGG[p.adjust(KEGG$over_represented_pvalue, method="BH")<.05,]
 keggtable=paste(filenm1,"Keggtables.txt",sep='_')
 dir.create("overallKeggtables")
 write.table(KEGG,paste("overallKeggtables/",keggtable,sep=''),row.names = F,quote = F,sep='\t')
+
 
  
 }
