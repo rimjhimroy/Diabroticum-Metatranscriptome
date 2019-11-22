@@ -8,3 +8,6 @@
 *.dat
 *.xls
 *.gz
+arthropoda_results/
+*.zip
+Dseq2_components
